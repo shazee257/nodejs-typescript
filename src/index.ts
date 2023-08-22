@@ -16,7 +16,7 @@ dbConnect();
 
 const server = http.createServer(app);
 
-app.use(cors({ credentials: true }));
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true, limit: "30mb" }));
 app.use("/uploads", express.static("uploads"));
@@ -27,10 +27,13 @@ app.use(
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
   })
 );
+
 app.use(Log);
+
 app.get("/", (req: Request, res: Response, next: NextFunction) => {
-  generateResponse({ key: "value" }, "success", res);
+  generateResponse({ session: req.session }, "success", res);
 });
+
 // new API(app).registerGroups();
 app.use(ErrorHandling.notFound);
 app.use(ErrorHandling.errorHandler);

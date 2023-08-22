@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import multer from "multer";
 import fs from "fs";
+import { Document, Model, Aggregate, AggregatePaginateModel } from "mongoose";
 
 export const generateResponse = (
   data: Record<string, any>,
@@ -52,6 +53,56 @@ export const upload = (folderName: string) => {
       return cb(null, false);
     },
   });
+};
+
+interface PaginationOptions {
+  page?: number;
+  limit?: number;
+  query?: any[];
+  populate?: string;
+  select?: string;
+  sort?: any;
+}
+
+interface PaginationResult<T> {
+  data: T[];
+  pagination: any; // You can define a proper pagination interface if needed
+}
+
+export const getMongooseAggregatePaginatedData = async <T extends Document>(
+  model: AggregatePaginateModel<T>,
+  {
+    page = 1,
+    limit = 10,
+    query = [],
+    populate = "",
+    select = "-password",
+    sort = { createdAt: -1 },
+  }: PaginationOptions
+): Promise<PaginationResult<T>> => {
+  const options = {
+    select,
+    sort,
+    populate,
+    lean: true,
+    page,
+    limit,
+    customLabels: {
+      totalDocs: "totalItems",
+      docs: "data",
+      limit: "perPage",
+      page: "currentPage",
+      meta: "pagination",
+    },
+  };
+
+  const myAggregate = model.aggregate(query);
+  const { docs: data, ...pagination } = await model?.aggregatePaginate<T>(
+    myAggregate,
+    options
+  );
+
+  return { data, pagination };
 };
 
 // pagination with mongoose paginate library
