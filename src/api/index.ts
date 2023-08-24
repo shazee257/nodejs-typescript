@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction, Application, Router } from "express";
-import authApi from "./auth";
+import AuthAPI from "./auth";
+import UserAPI from "./user";
 
 export default class API {
   app: Application;
@@ -13,7 +14,8 @@ export default class API {
   }
 
   loadRouteGroups() {
-    this.routeGroups.push(new authApi());
+    this.routeGroups.push(new AuthAPI());
+    this.routeGroups.push(new UserAPI());
   }
 
   setContentType(req: Request, res: Response, next: NextFunction) {

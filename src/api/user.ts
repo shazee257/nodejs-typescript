@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { loginUser, registerUser } from "../controller/user";
+import { getUser } from "../controller/user";
 
-export default class AuthAPI {
+export default class UserAPI {
   router: Router;
   constructor() {
     this.router = Router();
@@ -11,8 +11,8 @@ export default class AuthAPI {
   setupRoutes() {
     let router = this.router;
 
-    router.post("/register", registerUser);
-    router.post("/login", loginUser);
+    router.get("/", getUser);
+    // router.post("/login", login);
   }
 
   getRouter() {
@@ -20,6 +20,6 @@ export default class AuthAPI {
   }
 
   getRouterGroup() {
-    return "/auth";
+    return "/user";
   }
 }

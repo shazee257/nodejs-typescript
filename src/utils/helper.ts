@@ -4,7 +4,7 @@ import fs from "fs";
 import { Document, Model, Aggregate, AggregatePaginateModel } from "mongoose";
 
 export const generateResponse = (
-  data: Record<string, any>,
+  data: Record<string, any> | null,
   message: string,
   res: Response,
   code: number = 200
