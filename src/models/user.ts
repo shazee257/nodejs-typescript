@@ -16,6 +16,7 @@ const userSchema = new Schema<IUser>(
     },
     password: { type: String, require: true, select: false },
     refreshToken: { type: String, require: true, select: false },
+    fcmToken: { type: String, require: true, select: false },
   },
   { timestamps: true }
 );
@@ -23,7 +24,7 @@ const userSchema = new Schema<IUser>(
 userSchema.plugin(mongoosePaginate);
 userSchema.plugin(aggregatePaginate);
 
-const UserModel = model<IUser>("User", userSchema);
+export const UserModel = model("User", userSchema);
 
 // create new user
 export const createUser = (obj: Record<string, any>): Promise<IUser> => {
@@ -32,9 +33,14 @@ export const createUser = (obj: Record<string, any>): Promise<IUser> => {
 
 // find user by query
 export const findUser = (query: Record<string, any>): Promise<IUser | null> => {
-  return UserModel.findOne(query);
+  return UserModel.findOne(query).exec();
 };
 
+export const findUserWithPassword = (
+  query: Record<string, any>
+): Promise<IUser | null> => {
+  return UserModel.findOne(query).select("+password").exec();
+};
 // // find users by query without pagination
 // export const findUsers = (
 //   query: Record<string, any>

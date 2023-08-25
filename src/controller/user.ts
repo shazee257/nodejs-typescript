@@ -3,6 +3,7 @@ import { generateResponse, parseBody } from "../utils/helper";
 import {
   createUser,
   findUser,
+  findUserWithPassword,
   generateRefreshToken,
   generateToken,
   updateUser,
@@ -84,39 +85,40 @@ export const loginUser = async (
     });
 
   try {
-    const user = await findUser({ email: body.email });
-    if (user)
+    const userObj = await findUserWithPassword({ email: body.email });
+    if (!userObj)
       return next({
         statusCode: STATUS_CODES.CONFLICT,
-        message: "User already exists",
+        message: "User not exist",
       });
 
-    // hash password
-    const hashedPassword = await hash(body.password, 10);
-    body.password = hashedPassword;
+    const isMatch = await compare(body.password, userObj.password);
+    if (!isMatch)
+      return next({
+        statusCode: STATUS_CODES.UNAUTHORIZED,
+        message: "Invalid password",
+      });
 
-    const newUser = await createUser(body);
-
-    const accessToken = generateToken(newUser);
-    const refreshToken = generateRefreshToken(newUser);
+    const accessToken = generateToken(userObj);
+    const refreshToken = generateRefreshToken(userObj);
 
     req.session = { accessToken };
 
-    // // // update user with refreshToken
-    // const user = await updateUser(
-    //   { _id: newUser._id },
-    //   { $set: { refreshToken } }
-    // );
+    // update user with refreshToken
+    const user = await updateUser(
+      { _id: userObj._id },
+      { $set: { refreshToken } }
+    );
 
-    // generateResponse(
-    //   {
-    //     newUser,
-    //     accessToken,
-    //     refreshToken,
-    //   },
-    //   "Register successful",
-    //   res
-    // );
+    generateResponse(
+      {
+        user,
+        accessToken,
+        refreshToken,
+      },
+      "Register successful",
+      res
+    );
   } catch (error) {
     next(new Error((error as Error).message));
   }
