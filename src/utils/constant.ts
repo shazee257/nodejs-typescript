@@ -9,3 +9,8 @@ export const STATUS_CODES = Object.freeze({
   UNPROCESSABLE_ENTITY: 422,
   INTERNAL_SERVER_ERROR: 500,
 });
+
+export const ROLES = Object.freeze({
+  USER: "user",
+  ADMIN: "admin",
+});

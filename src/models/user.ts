@@ -57,24 +57,24 @@ export const updateUser = (
 };
 
 // // get all users
-// exports.getAllUsers = async ({
-//   query,
-//   page,
-//   limit,
-//   responseKey = "data",
-// }: {
-//   query: any[];
-//   page: number;
-//   limit: number;
-//   responseKey?: string;
-// }) => {
-//   const { data, pagination } = await getMongooseAggregatePaginatedData(
-//     UserModel,
-//     { query, page, limit }
-//   );
+export const getAllUsers = async ({
+  query,
+  page,
+  limit,
+  responseKey = "data",
+}: {
+  query: any[];
+  page: number;
+  limit: number;
+  responseKey?: string;
+}) => {
+  const { data, pagination } = await getMongooseAggregatePaginatedData(
+    UserModel,
+    { query, page, limit }
+  );
 
-//   return { [responseKey]: data, pagination };
-// };
+  return { [responseKey]: data, pagination };
+};
 
 export const generateToken = (user: IUser) => {
   const { JWT_EXPIRATION, JWT_SECRET } = process.env;

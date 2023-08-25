@@ -70,7 +70,7 @@ interface PaginationResult<T> {
 }
 
 export const getMongooseAggregatePaginatedData = async <T extends Document>(
-  model: AggregatePaginateModel<T>,
+  model: any,
   {
     page = 1,
     limit = 10,
@@ -97,7 +97,7 @@ export const getMongooseAggregatePaginatedData = async <T extends Document>(
   };
 
   const myAggregate = model.aggregate(query);
-  const { docs: data, ...pagination } = await model?.aggregatePaginate<T>(
+  const { data, pagination } = await model?.aggregatePaginate(
     myAggregate,
     options
   );

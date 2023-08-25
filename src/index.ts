@@ -6,7 +6,6 @@ import dbConnect from "./config/dbConnect";
 import cookieSession from "cookie-session";
 import Log from "./middlewares/log";
 import ErrorHandling from "./middlewares/errorHandling";
-import { generateResponse } from "./utils/helper";
 import API from "../src/api/index";
 
 const PORT: number = Number(process.env.PORT);
@@ -30,13 +29,9 @@ app.use(
 );
 
 app.use(Log);
+
 new API(app).registerGroups();
 
-app.get("/", (req: Request, res: Response, next: NextFunction) => {
-  generateResponse({ session: req.session }, "success", res);
-});
-
-// new API(app).registerGroups();
 app.use(ErrorHandling.notFound);
 app.use(ErrorHandling.errorHandler);
 

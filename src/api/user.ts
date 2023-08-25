@@ -1,8 +1,10 @@
 import { Router } from "express";
-import { getUser } from "../controller/user";
+import { fetchAllUsers, getUser } from "../controller/user";
+import AuthMiddleware from "../middlewares/Auth";
 
 export default class UserAPI {
   router: Router;
+
   constructor() {
     this.router = Router();
     this.setupRoutes();
@@ -11,8 +13,8 @@ export default class UserAPI {
   setupRoutes() {
     let router = this.router;
 
-    router.get("/", getUser);
-    // router.post("/login", login);
+    router.get("/", AuthMiddleware, getUser);
+    router.get("/search", AuthMiddleware, fetchAllUsers);
   }
 
   getRouter() {

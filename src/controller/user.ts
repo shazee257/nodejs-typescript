@@ -6,6 +6,7 @@ import {
   findUserWithPassword,
   generateRefreshToken,
   generateToken,
+  getAllUsers,
   updateUser,
 } from "../models/user";
 import { STATUS_CODES } from "../utils/constant";
@@ -14,21 +15,24 @@ import {
   loginUserValidation,
   registerUserValidation,
 } from "../validation/user";
+import { getUsersQuery } from "./queries/user";
+import { IUser } from "../types/user";
 
 export const registerUser = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const body: Record<string, any> = parseBody(req.body);
+  const body = parseBody(req.body);
+  // const body: Record<string, any> = parseBody(req.body);
 
   // Joi validation
-  const { error } = registerUserValidation.validate(body);
-  if (error)
-    return next({
-      statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY,
-      message: error.details[0].message,
-    });
+  // const { error } = registerUserValidation.validate(body);
+  // if (error)
+  //   return next({
+  //     statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY,
+  //     message: error.details[0].message,
+  //   });
 
   try {
     const userExists = await findUser({ email: body?.email });
@@ -132,6 +136,36 @@ export const getUser = async (
   try {
     const user = await findUser({ email: "user1@mailinator.com" });
     generateResponse(user, "Register successful", res);
+  } catch (error) {
+    next(new Error((error as Error).message));
+  }
+};
+
+export const fetchAllUsers = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  const userId = req.user.id;
+  const { search = "" } = req.query;
+
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 10;
+
+  const query = getUsersQuery(userId, search);
+
+  try {
+    const users = await getAllUsers({
+      query,
+      page,
+      limit,
+      responseKey: "users",
+    });
+    if (users?.users.length === 0) {
+      generateResponse(null, "Users not found", res);
+      return;
+    }
+    generateResponse(users, "Users found", res);
   } catch (error) {
     next(new Error((error as Error).message));
   }
